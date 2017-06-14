@@ -28,6 +28,24 @@
     "mdns-js": "0.4.0"
   },
   "permissions": [],
+  "capabilities": {
+    "mode": {
+      "type": "enum",
+      "title": {
+        "en": "Thermostat mode",
+        "nl": "Thermostaat modus"
+      },
+      "getable": true,
+      "setable": false,
+      "values": [
+        {"id": "0","title": {"en": "Home","nl": "Thuis"}},
+        {"id": "1","title": {"en": "Away","nl": "Afwezig"}},
+        {"id": "2","title": {"en": "Sleep","nl": "Slapen"}},
+        {"id": "3","title": {"en": "Vacation","nl": "Vakantie"}},
+        {"id": "4","title": {"en": "Frost protection","nl": "Vorstbeveiliging"}}
+      ]
+    }
+  },
   "drivers": [
     {
       "id": "anna",
@@ -42,7 +60,8 @@
       "icon": "/assets/icon.svg",
       "capabilities": [
         "target_temperature",
-        "measure_temperature"
+        "measure_temperature",
+        "mode"
       ],
       "capabilitiesOptions": {
         "target_temperature": {

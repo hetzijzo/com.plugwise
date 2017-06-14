@@ -113,6 +113,7 @@ module.exports.pair = function (socket) {
 							onoff: devices_data[i].onoff,
 							target_temperature: devices_data[i].target_temperature,
 							measure_temperature: devices_data[i].measure_temperature,
+							mode: devices_data[i].mode,
 							name: 'smile',
 							client: new Anna(device.password, device.ip, devices_data[i].id, device.hostname)
 						}
@@ -180,7 +181,24 @@ module.exports.capabilities = {
 				callback(true, false);
 			}
 		}
-	}
+	},
+
+  mode: {
+    get: function (device_data, callback) {
+      if (!device_data) callback(true, null);
+
+      // Get device
+      var device = getDevice(device_data.id);
+      if (device && device.client && device.client.mode) {
+
+        // Callback formatted value
+        callback(null, device.client.mode);
+      }
+      else {
+        callback(true, false);
+      }
+    }
+  }
 };
 
 function listenForEvents(device_data) {
@@ -188,7 +206,8 @@ function listenForEvents(device_data) {
 
 		var debouncers = {
 			"target_temperature": null,
-			"measure_temperature": null
+			"measure_temperature": null,
+			"mode": null
 		};
 
 		var device_data_obj = {
@@ -245,7 +264,23 @@ function listenForEvents(device_data) {
 				module.exports.realtime(device_data_obj, "measure_temperature", temperature);
 
 			}, 500);
-		});
+		}).on("mode", function (device_data, mode) {
+
+      // If debouncer present, reset it
+      if (debouncers["mode"]) {
+        debouncers["mode"] = clearTimeout(debouncers["mode"]);
+      }
+
+      // Set debouncer
+      debouncers["mode"] = setTimeout(()=> {
+
+        console.log("Anna: emit realtime mode update: " + mode);
+
+        // Emit realtime
+        module.exports.realtime(device_data_obj, "mode", mode);
+
+      }, 500);
+    });
 	}
 }
 
